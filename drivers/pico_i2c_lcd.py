@@ -1,8 +1,12 @@
 # forked from https://github.com/T-622/RPI-PICO-I2C-LCD/
+import sys
+sys.path.append('..')
+sys.path.append('../drivers')
+
 import utime
 import gc
 from machine import I2C
-from lcd_api import LcdApi
+from drivers.lcd_api import LcdApi
 
 
 # PCF8574 pin definitions

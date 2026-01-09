@@ -2,7 +2,9 @@ import network
 import socket
 import rp2
 import time
-import config_reader 
+
+
+IS_CONNECTED = None
 
 def connect_to_wifi(ssid: str, password: str, max_retries: int = 5) -> bool:
     """Connect to a WiFi network."""
@@ -19,20 +21,14 @@ def connect_to_wifi(ssid: str, password: str, max_retries: int = 5) -> bool:
             print("Waiting for connection...")
             time.sleep(2)
             retries += 1
-            
+      
     if wlan.isconnected():
         print("Connected to WiFi")
         print("Network config:", wlan.ifconfig())
+        
         return True
     else:
         print("Failed to connect to WiFi")
+        
         return False
     
-def main()->None:
-    config = config_reader.load_config()
-    ssid = config.get('ssid', 'DefaultSSID')
-    password = config.get('password', 'DefaultPW')
-    connect_to_wifi(ssid, password)
-
-if __name__ == "__main__":
-    main()

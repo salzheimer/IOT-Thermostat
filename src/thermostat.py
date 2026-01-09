@@ -1,8 +1,13 @@
+import sys
+sys.path.append('..')
+sys.path.append('../drivers')
+sys.path.append('../src')
+
 import dht
 from machine import Pin, SoftI2C
-from pico_i2c_lcd import I2cLcd
+from drivers.pico_i2c_lcd import I2cLcd
 from utime import sleep
-
+from src import data_send
 
     
 sensor = dht.DHT11(Pin(28))  # Assuming the temperature sensor is connected to GPIO 28
@@ -32,7 +37,7 @@ def main()->None:
     while True:
     
         temp, hum = read_temperature_sensor()
-        
+        data_send.send_data_to_azure(temp, hum)
         print("Temperature: {:.2f} °F, Humidity: {:.2f}%".format(temp, hum))
         
         lcd.move_to(0, 0)

@@ -1,0 +1,36 @@
+# MicroPython Thermostat Project Requirements
+
+# MicroPython Version
+# Tested with MicroPython v1.22.0 on Raspberry Pi Pico W
+
+# Hardware Libraries (built-in to MicroPython)
+# - dht (DHT11/DHT22 sensor driver)
+# - machine (Pin, SoftI2C for hardware control)
+# - network (WiFi connectivity)
+# - ntptime (NTP time synchronization)
+
+# HTTP Client
+# - urequests (MicroPython HTTP library for Azure IoT Hub)
+
+# Custom Drivers (included in this project)
+# - pico_i2c_lcd (I2C LCD driver for HD44780-compatible displays)
+# - lcd_api (LCD API abstraction layer)
+
+# Development Dependencies (for testing on Python 3)
+# Uncomment the following for local development/testing:
+# pytest>=7.0.0
+# pytest-cov>=4.0.0
+# ruff>=0.1.0  # Linter and formatter
+
+# Note: MicroPython libraries cannot be installed via pip
+# These must be copied directly to the Pico device
+
+# External Library Installation (if needed):
+# Some libraries can be installed using upip on the device:
+# >>> import upip
+# >>> upip.install('micropython-urequests')
+
+# For Azure IoT Hub communication, you need:
+# - Valid Azure IoT Hub instance
+# - Device registration with SAS token
+# - Network connectivity

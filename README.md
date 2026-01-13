@@ -116,7 +116,6 @@ Humidity: 45.00%
 ```
 .
 ├── src/                 # Application source code
-│   ├── main.py         # Entry point, WiFi/NTP setup
 │   ├── thermostat.py   # Main thermostat logic and sensor reading
 │   └── data_send.py    # Azure IoT Hub data transmission
 ├── drivers/             # Hardware drivers
@@ -131,6 +130,7 @@ Humidity: 45.00%
 ├── tests/               # Test files
 │   ├── README.md       # Testing documentation
 │   └── test_config_reader.py # Unit tests for config reader
+|-- main.py              # Entry point, WiFi/NTP setup
 ├── docs/                # Additional documentation
 ├── config.txt           # Configuration file (not tracked in git)
 ├── config.example.txt   # Configuration template
@@ -141,7 +141,7 @@ Humidity: 45.00%
 
 ## Module Descriptions
 
-### [src/main.py](src/main.py)
+### [main.py](src/main.py)
 Entry point that handles WiFi connection, NTP time synchronization, and starts the thermostat application.
 
 ### [src/thermostat.py](src/thermostat.py)

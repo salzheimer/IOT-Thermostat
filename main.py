@@ -1,12 +1,17 @@
 import sys
+import time
+import ntptime
+import src.thermostat as thermostat
+import src.display as display
+import src.data_send as data_send
+
+from utils import config_reader
+from utils import wifi_connect as wifi
+
 sys.path.append('..')
 sys.path.append('../utils')
 
-import src.thermostat as thermostat
-import time
-import ntptime
-from utils import config_reader
-from utils import wifi_connect as wifi
+
 
 
 def synchronize_time() -> None:
@@ -30,7 +35,19 @@ def main() -> None:
     synchronize_time()
 
 #=== Start the thermostat and display  application ===#
-    thermostat.main()
+    display.initialize_lcd()
+
+    data_send.configure_azure_sas()
+    
+    while True:
+        temp, hum = thermostat.read_temperature_sensor()
+        print("WiFi connection status inside main loop:", wifi.IS_CONNECTED)
+        if wifi.IS_CONNECTED:
+            data_send.send_data_to_azure_sas(temp, hum)
+        print("Temperature: {:.2f} °F, Humidity: {:.2f}%".format(temp, hum))
+        
+        display.update_lcd(temp, hum)   
+        time.sleep(15)
 
 
 

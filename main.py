@@ -37,13 +37,15 @@ def main() -> None:
 #=== Start the thermostat and display  application ===#
     display.initialize_lcd()
 
-    data_send.configure_azure_sas()
-    
+    #data_send.configure_azure_sas()
+    data_send.intialize_azure_x509()
+    client = data_send.intialize_azure_x509()
     while True:
         temp, hum = thermostat.read_temperature_sensor()
         print("WiFi connection status inside main loop:", wifi.IS_CONNECTED)
         if wifi.IS_CONNECTED:
-            data_send.send_data_to_azure_sas(temp, hum)
+    #        data_send.send_data_to_azure_sas(temp, hum)
+            data_send.send_data_to_azure_x509(client, temp, hum)
         print("Temperature: {:.2f} °F, Humidity: {:.2f}%".format(temp, hum))
         
         display.update_lcd(temp, hum)   

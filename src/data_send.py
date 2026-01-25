@@ -7,6 +7,8 @@ from utils import config_reader
 import time
 import urequests
 import umqtt.simple as mqtt
+import ssl
+import json
 
 config = config_reader.load_config()
 IOT_HUB_HOSTNAME = config.get('IOT_HUB_HOSTNAME', 'your-iot-hub.azure-devices.net')
@@ -14,7 +16,7 @@ DEVICE_ID = config.get('DEVICE_ID', 'your-device-id')
 
 
 def get_IsoTimestamp():
-    
+
     """Get the current time in ISO 8601 format."""
     t=time.localtime()
     return "{}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}Z".format(t[0], t[1], t[2], t[3], t[4], t[5])
@@ -26,7 +28,7 @@ def configure_azure_sas() -> None:
     global URL, HEADERS
 
         # Azure IoT Hub connection settings
-   
+
     SAS_TOKEN = config.get('SAS_TOKEN', 'your-sas-token')
 
     print("Azure IoT Hub Hostname:", IOT_HUB_HOSTNAME)
@@ -42,7 +44,7 @@ def configure_azure_sas() -> None:
 
 def send_data_to_azure_sas(temperature: float, humidity: float) -> None:
 
-    
+
 
 
     print("Preparing to send data to Azure IoT Hub using SAS token...")
@@ -67,7 +69,7 @@ def send_data_to_azure_sas(temperature: float, humidity: float) -> None:
 
 
 ##
-# 
+#
 # Data sending with X509 certificate is not implemented in this example.
 #
 # ##
@@ -77,6 +79,7 @@ def load_certificates(file_path: str):
     try:
         with open(file_path, 'rb') as cert_file:
             certificate = cert_file.read()
+        cert_file.close()
         return certificate
     except Exception as e:
         print("Failed to load certificate from", file_path, ":", e)
@@ -84,13 +87,17 @@ def load_certificates(file_path: str):
 
 def intialize_azure_x509() -> None:
     """Placeholder function for initializing Azure IoT Hub connection using X.509 certificates."""
-    print("X.509 certificate-based authentication is implemented in this example.") 
+    print("X.509 certificate-based authentication is implemented in this example.")
     # MQTT configuration
     MQTT_BROKER = f"{IOT_HUB_HOSTNAME}.azure-devices.net"
     MQTT_PORT = 8883
     MQTT_CLIENT_ID = DEVICE_ID
-    #MQTT_USERNAME = f"{MQTT_BROKER}/{DEVICE_ID}/?api-version=2021-04-12"
-    #MQTT_PASSWORD = ""  # Empty for x509 authentication
+    MQTT_USERNAME = f"{MQTT_BROKER}/{DEVICE_ID}/?api-version=2021-04-12"
+    MQTT_PASSWORD = "" # Empty for x509 authentication
+
+    print("MQTT Broker:", MQTT_BROKER)
+    print("MQTT Client ID:", MQTT_CLIENT_ID)
+    print("MQTT Username:", MQTT_USERNAME)
 
     try:
         CERT_FILE_PATH = config.get('CERT_FILE_PATH', 'path/to/certificate.pem')
@@ -102,23 +109,26 @@ def intialize_azure_x509() -> None:
         print("Loaded private key from:", KEY_FILE_PATH)
         print("Private key contents:", private_key)
 
-        print("Connecting to Azure IOT Hub..")
+        CA_FILE_PATH = config.get('CA_FILE_PATH', 'path/to/ca_certificate.pem')
+        ca_certificate = load_certificates(CA_FILE_PATH)
+        print("Loaded CA certificate from:", CA_FILE_PATH)
+        print("CA Certificate contents:", ca_certificate)
 
+       
+
+        print("Connecting to Azure IOT Hub..")
         client= mqtt.MQTTClient(
             client_id=MQTT_CLIENT_ID,
             server=MQTT_BROKER,
             port=MQTT_PORT,
-          #  user=MQTT_USERNAME,
-           # password=MQTT_PASSWORD,
+            user=MQTT_USERNAME,
+            password=MQTT_PASSWORD,
             ssl=True,
             ssl_params={
                 "cert": certificate,
                 "key": private_key,
                 "server_hostname": MQTT_BROKER,
-                "server_side": False #,
-                # "cert_reqs": mqtt.ssl.CERT_REQUIRED,
-                # "cadata": None,
-                # "do_handshake_on_connect": True
+               
             }
         )
         client.connect()
@@ -126,23 +136,26 @@ def intialize_azure_x509() -> None:
         return client
     except Exception as e:
         print("Failed to connect to Azure IoT Hub", e )
-        
+        sys.print_exception(e)
+        return None
 
 
 
 def send_data_to_azure_x509(client,temperature: float, humidity: float) -> None:
     """Placeholder function for sending data to Azure IoT Hub using X.509 certificates."""
-    print("X.509 certificate-based authentication is implemented in this example.")    
+    print("X.509 certificate-based authentication is implemented in this example.")
     payload = {
         "deviceId": DEVICE_ID,
         "temperature": temperature,
         "humidity": humidity,
         "timestamp": get_IsoTimestamp()
     }
-    print("Prepared payload for Azure IoT Hub:", payload)
-    topic = f"devices/{DEVICE_ID}/messages/events/"
+    json_payload = json.dumps(payload)
+    print("Prepared payload for Azure IoT Hub:", json_payload)
+    topic = f"devices/{DEVICE_ID}/messages/events"
     try:
-        client.publish(topic, str(payload))
+
+        client.publish(topic, json_payload.encode('utf-8'))
         print("Data sent to Azure IoT Hub using X.509 certificates.")
     except Exception as e:
         print("Failed to send data to Azure IoT Hub:", e)

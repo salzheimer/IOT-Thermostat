@@ -38,12 +38,14 @@ def main() -> None:
     display.initialize_lcd()
 
     #data_send.configure_azure_sas()
-    data_send.intialize_azure_x509()
+    
     client = data_send.intialize_azure_x509()
+    print("Initial Azure IoT Hub client:", client)
+    
     while True:
         temp, hum = thermostat.read_temperature_sensor()
         print("WiFi connection status inside main loop:", wifi.IS_CONNECTED)
-        if wifi.IS_CONNECTED:
+        if wifi.IS_CONNECTED and client is not None:
     #        data_send.send_data_to_azure_sas(temp, hum)
             data_send.send_data_to_azure_x509(client, temp, hum)
         print("Temperature: {:.2f} °F, Humidity: {:.2f}%".format(temp, hum))

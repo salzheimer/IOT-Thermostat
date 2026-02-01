@@ -61,7 +61,7 @@ def send_data_to_azure_sas(temperature: float, humidity: float) -> None:
     # For example, using the 'urequests' library on MicroPython:
     try:
         response = urequests.post(URL, json=payload, headers=HEADERS)
-        print("Response from Azure IoT Hub:", response.text)
+        print("Response from Azure IoT Hub via SAS token:", response.text)
         response.close()
 
     except Exception as e:
@@ -109,10 +109,10 @@ def intialize_azure_x509() -> None:
         print("Loaded private key from:", KEY_FILE_PATH)
         print("Private key contents:", private_key)
 
-        CA_FILE_PATH = config.get('CA_FILE_PATH', 'path/to/ca_certificate.pem')
-        ca_certificate = load_certificates(CA_FILE_PATH)
-        print("Loaded CA certificate from:", CA_FILE_PATH)
-        print("CA Certificate contents:", ca_certificate)
+        # CA_FILE_PATH = config.get('CA_FILE_PATH', 'path/to/ca_certificate.pem')
+        # ca_certificate = load_certificates(CA_FILE_PATH)
+        # print("Loaded CA certificate from:", CA_FILE_PATH)
+        # print("CA Certificate contents:", ca_certificate)
 
        
 

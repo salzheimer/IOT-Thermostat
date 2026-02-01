@@ -5,12 +5,34 @@ Password=YourWiFiPassword
 # Azure IoT Hub Configuration
 IOT_HUB_HOSTNAME=your-iot-hub-name
 DEVICE_ID=your-device-id
+
+# Authentication Method Selection
+# Set to True for SAS Token authentication, False for X.509 Certificate authentication
+USE_SAS_AUTH=True
+
+# SAS Token Authentication (only used if USE_SAS_AUTH=True)
 SAS_TOKEN=your-sas-token-here
 
+# X.509 Certificate Authentication (only used if USE_SAS_AUTH=False)
+# Path to your device certificate file (PEM or DER format)
+CERT_FILE_PATH=certs/your-device.crt.der
+# Path to your device private key file (PEM or DER format)
+KEY_FILE_PATH=certs/your-device.key.der
+# Optional: Path to CA certificate (uncomment if needed)
+# CA_FILE_PATH=certs/ca-certificate.pem
+
 # Instructions:
-# 1. Copy this file to config.txt
+# 1. Copy this file to config.txt: cp config.example.txt config.txt
 # 2. Replace all placeholder values with your actual credentials
-# 3. Never commit config.txt to version control (it's in .gitignore)
+# 3. Choose authentication method by setting USE_SAS_AUTH
+# 4. Never commit config.txt to version control (it's in .gitignore)
 #
-# To generate a SAS token for Azure IoT Hub, use the Azure CLI or IoT Explorer
-# Token format: sr=<hub>.azure-devices.net%2Fdevices%2F<device>&sig=<signature>&se=<expiry>
+# SAS Token Authentication:
+# - To generate a SAS token, use Azure CLI or IoT Explorer
+# - Token format: sr=<hub>.azure-devices.net%2Fdevices%2F<device>&sig=<signature>&se=<expiry>
+#
+# X.509 Certificate Authentication:
+# - Generate certificates using Azure IoT Hub or your own CA
+# - Store certificate files in the certs/ directory
+# - DER format is recommended for MicroPython (smaller file size)
+# - Ensure certificate is registered in Azure IoT Hub device settings

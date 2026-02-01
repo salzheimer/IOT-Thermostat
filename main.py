@@ -12,10 +12,10 @@ sys.path.append('..')
 sys.path.append('../utils')
 
 
-
-
+config = config_reader.load_config()
+USE_SAS_AUTH = config.get("USE_SAS_AUTH", True)
 def synchronize_time() -> None:
-    config = config_reader.load_config()    
+     
     ssid = config.get('SSID', 'DefaultSSID')
     password = config.get('Password', 'DefaultPW')
     wifi.IS_CONNECTED = wifi.connect_to_wifi(ssid, password)
@@ -33,22 +33,27 @@ def synchronize_time() -> None:
 
 def main() -> None:
     synchronize_time()
-
+    print("USE_SAS_AUTH =", USE_SAS_AUTH)
 #=== Start the thermostat and display  application ===#
     display.initialize_lcd()
-
-    #data_send.configure_azure_sas()
-    
-    client = data_send.intialize_azure_x509()
-    print("Initial Azure IoT Hub client:", client)
+    client = None
+    if USE_SAS_AUTH is True:
+        data_send.configure_azure_sas()
+        print("Configured Azure IoT Hub with SAS authentication.")
+    else:
+        client = data_send.intialize_azure_x509()
+        print("Initial Azure IoT Hub client:", client)
     
     while True:
         temp, hum = thermostat.read_temperature_sensor()
         print("WiFi connection status inside main loop:", wifi.IS_CONNECTED)
-        if wifi.IS_CONNECTED and client is not None:
-    #        data_send.send_data_to_azure_sas(temp, hum)
-            data_send.send_data_to_azure_x509(client, temp, hum)
-        print("Temperature: {:.2f} °F, Humidity: {:.2f}%".format(temp, hum))
+        if wifi.IS_CONNECTED:
+            if USE_SAS_AUTH is True:
+                data_send.send_data_to_azure_sas(temp, hum)
+            else:
+                data_send.send_data_to_azure_x509(client, temp, hum)
+
+            print("Temperature: {:.2f} °F, Humidity: {:.2f}%".format(temp, hum))
         
         display.update_lcd(temp, hum)   
         time.sleep(15)
